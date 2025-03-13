@@ -14,12 +14,12 @@ export const data = [
 			{
 				title: 'Gold prices',
 				icon: MediasIcon,
-				link: '/admin/goldprices'
+				link: '/goldprices'
 			},
 			{
 				title: 'About',
 				icon: ContactIcon,
-				link: '/admin/about'
+				link: '/about'
 			}
 		]
 	}
