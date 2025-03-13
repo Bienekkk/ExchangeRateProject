@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-	<title>Servers</title>
+	<title>About</title>
 </svelte:head>
 
-<Content title="Servers" />
+<Content title="About" />

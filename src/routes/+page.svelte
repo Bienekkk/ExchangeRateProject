@@ -3,6 +3,6 @@
 </script>
 
 <svelte:head>
-  <title>Salvia-kit Dashboard v7 with Svelte-kit</title>
+	<title>Exchange Rate Project</title>
 </svelte:head>
-<Content title="Home"/>
+<Content title="Currency prices" />

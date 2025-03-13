@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-	<title>Contacts</title>
+	<title>Gold prices</title>
 </svelte:head>
 
-<Content title="Contacts" />
+<Content title="Gold prices" />
