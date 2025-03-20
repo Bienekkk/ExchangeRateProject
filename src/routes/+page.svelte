@@ -77,7 +77,7 @@
 
 <div class="container flex gap-3 items-center md:flex-row flex-col">
 	<div>
-		<input type="number" bind:value={$amount} on:input={convert} />
+		<input type="number" bind:value={$amount} on:input={convert} min="0" />
 		<select bind:value={$fromCurrency} on:change={convert}>
 			{#each Object.keys($exchangeRates) as currency}
 				<option value={currency}>{currency}</option>
@@ -106,7 +106,7 @@
 		>
 	</button>
 	<div>
-		<input type="number" bind:value={$convertedAmount} on:input={convert2} />
+		<input type="number" bind:value={$convertedAmount} on:input={convert2} min="0" />
 		<select bind:value={$toCurrency} on:change={convert}>
 			{#each Object.keys($exchangeRates) as currency}
 				<option value={currency}>{currency}</option>
