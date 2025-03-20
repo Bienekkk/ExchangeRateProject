@@ -172,7 +172,7 @@
 		>
 	</button>
 	<div>
-		<input type="number" bind:value={$convertedAmount} on:input={convert2} />
+		<input type="number" bind:value={$convertedAmount} on:input={convert2} min="0" />
 		<select
 			bind:value={$toCurrency}
 			on:change={() => {

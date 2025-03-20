@@ -1,49 +1,65 @@
 <script lang="ts">
-	import Content from '../../components/Content.svelte';
-	import { onMount } from 'svelte';
+    import { onMount } from 'svelte';
+    import Chart from 'chart.js/auto';
 
-	let tasks: Array<{ Data: string; Code: number }> = [];
-	const url = 'https://api.nbp.pl/api/cenyzlota';
+    let chart: Chart | null = null;
+    let goldPrices: Array<{ data: string; cena: number }> = [];
 
-	onMount(async () => {
-		try {
-			const response = await fetch(url);
-			const data = await response.json();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 7);
+    const endDate = new Date();
 
-			if (data && Array.isArray(data)) {
-				tasks = data;
-			} else {
-				tasks = [];
-			}
-		} catch (error) {
-			console.error('Błąd podczas pobierania danych:', error);
-			tasks = [];
-		}
-	});
+    const formatDate = (date: Date): string => {
+        return date.toISOString().split('T')[0];
+    };
+
+    const url = `https://api.nbp.pl/api/cenyzlota/${formatDate(startDate)}/${formatDate(endDate)}`;
+
+    onMount(async () => {
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data && Array.isArray(data)) {
+                goldPrices = data.map(d => ({ data: d.data, cena: d.cena }));
+                renderChart();
+            }
+        } catch (error) {
+            console.error('Błąd podczas pobierania danych:', error);
+        }
+    });
+
+    function renderChart() {
+        const ctx = document.getElementById('goldChart') as HTMLCanvasElement;
+        if (chart) {
+            chart.destroy();
+        }
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: goldPrices.map(d => d.data),
+                datasets: [{
+                    label: 'Cena złota (PLN/gram)',
+                    data: goldPrices.map(d => d.cena),
+                    borderColor: 'gold',
+                    backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                    fill: true,
+                }],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Data' } },
+                    y: { title: { display: true, text: 'Cena (PLN)' } }
+                }
+            }
+        });
+    }
 </script>
 
 <svelte:head>
-	<title>Gold prices</title>
+    <title>Gold Prices Chart</title>
 </svelte:head>
 
-<Content title="Gold prices" />
-
-{#if tasks.length > 0}
-	<table>
-		<thead>
-			<tr>
-				<th class="text-white">Data</th>
-				<th class="text-white">Cena za gram (PLN)</th>
-			</tr>
-		</thead>
-
-		{#each tasks as t}
-			<tr>
-				<!-- <td class="text-white">{t.Data}</td>
-				<td class="text-white">{t.Code}</td> -->
-			</tr>
-		{/each}
-	</table>
-{:else}
-	<p class="text-white">Brak danych do wyświetlenia.</p>
-{/if}
+<h1 class="text-white">Gold Prices Chart</h1>
+<canvas id="goldChart"></canvas>
