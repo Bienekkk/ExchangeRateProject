@@ -2,19 +2,24 @@
 	import Content from '../components/Content.svelte';
 	import { onMount } from 'svelte';
 	import { writable } from 'svelte/store';
+	import Chart from 'chart.js/auto';
 
 	let amount = writable<number>(1);
 	let convertedAmount = writable<number>();
 	let fromCurrency = writable<string>('PLN');
 	let toCurrency = writable<string>('EUR');
 	let exchangeRates = writable<Record<string, number>>({});
+	let historicalRates = writable<number[]>([]);
+	let historicalDates = writable<string[]>([]);
+	let days = writable<number>(30);
+	let chart: Chart | null = null;
 
 	async function fetchRates() {
 		try {
 			const responses = await Promise.all([
 				fetch('https://api.nbp.pl/api/exchangerates/tables/A?format=json'),
-				fetch('https://api.nbp.pl/api/exchangerates/tables/B?format=json'),
-				fetch('https://api.nbp.pl/api/exchangerates/tables/C?format=json')
+				fetch('https://api.nbp.pl/api/exchangerates/tables/B?format=json')
+				//fetch('https://api.nbp.pl/api/exchangerates/tables/C?format=json')
 			]);
 			const data = await Promise.all(responses.map((res) => res.json()));
 
@@ -29,17 +34,16 @@
 				});
 			});
 
-			console.log('Updated exchange rates:', rates); // Debugging output
 			exchangeRates.set(rates);
 		} catch (error) {
 			console.error('Error fetching exchange rates:', error);
 		}
 		convert();
+		fetchHistoricalRates();
 	}
 
 	function convert() {
-		const rates = $exchangeRates; // Get the actual object from the store
-
+		const rates = $exchangeRates;
 		if (rates[$fromCurrency] && rates[$toCurrency]) {
 			const am = (($amount / rates[$toCurrency]) * rates[$fromCurrency]).toFixed(2);
 			convertedAmount.set(parseFloat(am));
@@ -47,8 +51,7 @@
 	}
 
 	function convert2() {
-		const rates = $exchangeRates; // Get the actual object from the store
-
+		const rates = $exchangeRates;
 		if (rates[$fromCurrency] && rates[$toCurrency]) {
 			const am = (($convertedAmount / rates[$toCurrency]) * rates[$fromCurrency]).toFixed(2);
 			amount.set(parseFloat(am));
@@ -65,7 +68,70 @@
 			toCurrency.set(temp);
 		}
 		convert();
+		fetchHistoricalRates();
 	}
+
+	async function fetchHistoricalRates() {
+		try {
+			const responses = await Promise.all([
+				fetch(
+					`https://api.nbp.pl/api/exchangerates/rates/A/${$toCurrency}/last/${$days}?format=json`
+				).then((res) => (res.ok ? res.json() : null)),
+				fetch(
+					`https://api.nbp.pl/api/exchangerates/rates/B/${$toCurrency}/last/${$days}?format=json`
+				).then((res) => (res.ok ? res.json() : null))
+			]);
+
+			const dataA = responses[0]?.rates || [];
+			const dataB = responses[1]?.rates || [];
+
+			const dates = dataA.length
+				? dataA.map((rate: { effectiveDate: string }) => rate.effectiveDate)
+				: dataB.map((rate: { effectiveDate: string }) => rate.effectiveDate);
+			const ratesA = dataA.map((rate: { mid: number }) => rate.mid);
+			const ratesB = dataB.map((rate: { mid: number }) => rate.mid);
+
+			const combinedRates = dates.map((_, index) => {
+				const rateA = ratesA[index] ?? 0;
+				const rateB = ratesB[index] ?? 0;
+				return rateA && rateB ? (rateA + rateB) / 2 : rateA || rateB;
+			});
+
+			historicalDates.set(dates);
+			historicalRates.set(combinedRates);
+			updateChart();
+		} catch (error) {
+			console.error('Error fetching historical rates:', error);
+		}
+	}
+
+	function updateChart() {
+		if (chart) {
+			chart.destroy();
+		}
+
+		const ctx = document.getElementById('exchangeRateChart') as HTMLCanvasElement;
+		chart = new Chart(ctx, {
+			type: 'line',
+			data: {
+				labels: $historicalDates,
+				datasets: [
+					{
+						label: `Exchange Rate of ${$toCurrency} over the last ${days} days`,
+						data: $historicalRates,
+						borderColor: 'green',
+						fill: false
+					}
+				]
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: false
+			}
+		});
+	}
+
+	$: fetchHistoricalRates(); // Update chart when currency changes
 
 	onMount(fetchRates);
 </script>
@@ -107,10 +173,32 @@
 	</button>
 	<div>
 		<input type="number" bind:value={$convertedAmount} on:input={convert2} />
-		<select bind:value={$toCurrency} on:change={convert}>
+		<select
+			bind:value={$toCurrency}
+			on:change={() => {
+				convert();
+				fetchHistoricalRates();
+			}}
+		>
 			{#each Object.keys($exchangeRates) as currency}
 				<option value={currency}>{currency}</option>
 			{/each}
 		</select>
 	</div>
+</div>
+
+<div class="container mt-4 h-96">
+	<canvas id="exchangeRateChart" />
+</div>
+
+<div class="mt-4">
+	<label class="text-white" for="days">Number of days:</label>
+	<input
+		id="days"
+		type="number"
+		min="1"
+		max="90"
+		bind:value={$days}
+		on:input={fetchHistoricalRates}
+	/>
 </div>
