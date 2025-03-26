@@ -6,8 +6,8 @@
 
 	let amount = writable<number>(1);
 	let convertedAmount = writable<number>();
-	let fromCurrency = writable<string>('PLN');
-	let toCurrency = writable<string>('EUR');
+	let fromCurrency = writable<string>('EUR');
+	let toCurrency = writable<string>('PLN');
 	let exchangeRates = writable<Record<string, number>>({});
 	let historicalRates = writable<number[]>([]);
 	let historicalDates = writable<string[]>([]);
@@ -73,32 +73,77 @@
 
 	async function fetchHistoricalRates() {
 		try {
-			const responses = await Promise.all([
-				fetch(
-					`https://api.nbp.pl/api/exchangerates/rates/A/${$toCurrency}/last/${$days}?format=json`
-				).then((res) => (res.ok ? res.json() : null)),
-				fetch(
-					`https://api.nbp.pl/api/exchangerates/rates/B/${$toCurrency}/last/${$days}?format=json`
-				).then((res) => (res.ok ? res.json() : null))
-			]);
+			if ($fromCurrency != 'PLN') {
+				const responses = await Promise.all([
+					fetch(
+						`https://api.nbp.pl/api/exchangerates/rates/A/${$fromCurrency}/last/${$days}?format=json`
+					).then((res) => (res.ok ? res.json() : null)),
+					fetch(
+						`https://api.nbp.pl/api/exchangerates/rates/B/${$fromCurrency}/last/${$days}?format=json`
+					).then((res) => (res.ok ? res.json() : null))
+				]);
 
-			const dataA = responses[0]?.rates || [];
-			const dataB = responses[1]?.rates || [];
+				const dataA = responses[0]?.rates || [];
+				const dataB = responses[1]?.rates || [];
 
-			const dates = dataA.length
-				? dataA.map((rate: { effectiveDate: string }) => rate.effectiveDate)
-				: dataB.map((rate: { effectiveDate: string }) => rate.effectiveDate);
-			const ratesA = dataA.map((rate: { mid: number }) => rate.mid);
-			const ratesB = dataB.map((rate: { mid: number }) => rate.mid);
+				const dates = dataA.length
+					? dataA.map((rate: { effectiveDate: string }) => rate.effectiveDate)
+					: dataB.map((rate: { effectiveDate: string }) => rate.effectiveDate);
+				console.log(dates);
 
-			const combinedRates = dates.map((_, index) => {
-				const rateA = ratesA[index] ?? 0;
-				const rateB = ratesB[index] ?? 0;
-				return rateA && rateB ? (rateA + rateB) / 2 : rateA || rateB;
-			});
+				const ratesA = dataA.map((rate: { mid: number }) => rate.mid);
+				const ratesB = dataB.map((rate: { mid: number }) => rate.mid);
+				console.log(ratesA);
+				const combinedRates = dates.map((_, index) => {
+					const rateA = ratesA[index] ?? 0;
+					const rateB = ratesB[index] ?? 0;
+					return rateA && rateB ? (rateA + rateB) / 2 : rateA || rateB;
+				});
 
-			historicalDates.set(dates);
-			historicalRates.set(combinedRates);
+				//console.log($exchangeRates[$toCurrency]);
+				combinedRates.map((el, index) => {
+					//console.log(el / $exchangeRates[$toCurrency]);
+					combinedRates[index] = el / $exchangeRates[$toCurrency];
+				});
+
+				historicalDates.set(dates);
+				historicalRates.set(combinedRates);
+			} else {
+				console.log('PLN');
+				const responses = await Promise.all([
+					fetch(
+						`https://api.nbp.pl/api/exchangerates/rates/A/${$toCurrency}/last/${$days}?format=json`
+					).then((res) => (res.ok ? res.json() : null)),
+					fetch(
+						`https://api.nbp.pl/api/exchangerates/rates/B/${$toCurrency}/last/${$days}?format=json`
+					).then((res) => (res.ok ? res.json() : null))
+				]);
+
+				const dataA = responses[0]?.rates || [];
+				const dataB = responses[1]?.rates || [];
+
+				const dates = dataA.length
+					? dataA.map((rate: { effectiveDate: string }) => rate.effectiveDate)
+					: dataB.map((rate: { effectiveDate: string }) => rate.effectiveDate);
+				console.log(dates);
+
+				const ratesA = dataA.map((rate: { mid: number }) => rate.mid);
+				const ratesB = dataB.map((rate: { mid: number }) => rate.mid);
+				console.log(ratesA);
+				const combinedRates = dates.map((_, index) => {
+					const rateA = ratesA[index] ?? 0;
+					const rateB = ratesB[index] ?? 0;
+					return rateA && rateB ? (rateA + rateB) / 2 : rateA || rateB;
+				});
+
+				//console.log($exchangeRates[$toCurrency]);
+				combinedRates.map((el, index) => {
+					//console.log(el / $exchangeRates[$toCurrency]);
+					combinedRates[index] = 1 / el;
+				});
+				historicalDates.set(dates);
+				historicalRates.set(combinedRates);
+			}
 			updateChart();
 		} catch (error) {
 			console.error('Error fetching historical rates:', error);
@@ -117,7 +162,7 @@
 				labels: $historicalDates,
 				datasets: [
 					{
-						label: `Exchange Rate of ${$toCurrency} over the last ${days} days`,
+						label: `Exchange Rate of ${$toCurrency} over the last ${$days} days`,
 						data: $historicalRates,
 						borderColor: 'green',
 						fill: false
@@ -144,7 +189,13 @@
 <div class="container flex gap-3 items-center md:flex-row flex-col">
 	<div>
 		<input type="number" bind:value={$amount} on:input={convert} />
-		<select bind:value={$fromCurrency} on:change={convert}>
+		<select
+			bind:value={$fromCurrency}
+			on:change={() => {
+				convert();
+				fetchHistoricalRates();
+			}}
+		>
 			{#each Object.keys($exchangeRates) as currency}
 				<option value={currency}>{currency}</option>
 			{/each}
