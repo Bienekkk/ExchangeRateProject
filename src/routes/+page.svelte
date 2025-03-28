@@ -188,8 +188,9 @@
 
 <div class="container flex gap-3 items-center md:flex-row flex-col">
 	<div>
-		<input type="number" bind:value={$amount} on:input={convert} />
+		<input class="bg-gray-700 text-white" type="number" bind:value={$amount} on:input={convert} />
 		<select
+			class="bg-gray-700 text-white"
 			bind:value={$fromCurrency}
 			on:change={() => {
 				convert();
@@ -197,7 +198,7 @@
 			}}
 		>
 			{#each Object.keys($exchangeRates) as currency}
-				<option value={currency}>{currency}</option>
+				<option class="bg-gray-700" value={currency}>{currency}</option>
 			{/each}
 		</select>
 	</div>
@@ -223,8 +224,15 @@
 		>
 	</button>
 	<div>
-		<input type="number" bind:value={$convertedAmount} on:input={convert2} min="0" />
+		<input
+			class="bg-gray-700 text-white"
+			type="number"
+			bind:value={$convertedAmount}
+			on:input={convert2}
+			min="0"
+		/>
 		<select
+			class="bg-gray-700 text-white"
 			bind:value={$toCurrency}
 			on:change={() => {
 				convert();
@@ -232,7 +240,7 @@
 			}}
 		>
 			{#each Object.keys($exchangeRates) as currency}
-				<option value={currency}>{currency}</option>
+				<option class="bg-gray-700 text-white" value={currency}>{currency}</option>
 			{/each}
 		</select>
 	</div>
@@ -245,6 +253,7 @@
 <div class="mt-4">
 	<label class="text-white" for="days">Number of days:</label>
 	<input
+		class="bg-gray-700 text-white pl-1 rounded-lg shadow-md"
 		id="days"
 		type="number"
 		min="1"

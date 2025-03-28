@@ -27,7 +27,11 @@
 			</div>
 			<div class="flex items-center justify-end ml-5 p-1 relative w-1/6 sm:mr-0 sm:right-auto">
 				<span class="block relative">
-					<img alt="CR7" src="/images/1.png" class="h-10 mx-auto object-cover rounded-full w-10" />
+					<img
+						alt="CR7"
+						src="/images/npm-logo.png"
+						class="h-10 mx-auto object-cover rounded-full w-10	"
+					/>
 				</span>
 			</div>
 		</div>
