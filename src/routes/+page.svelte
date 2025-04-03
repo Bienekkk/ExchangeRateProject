@@ -187,10 +187,15 @@
 <Content title="Currency prices" />
 
 <div class="container flex gap-3 items-center md:flex-row flex-col">
-	<div>
-		<input class="bg-gray-700 text-white" type="number" bind:value={$amount} on:input={convert} />
+	<div class="flex gap-0 items-center">
+		<input
+			class="bg-gray-700 text-white p-1 rounded-l-lg h-8 border-r-2"
+			type="number"
+			bind:value={$amount}
+			on:input={convert}
+		/>
 		<select
-			class="bg-gray-700 text-white"
+			class="bg-gray-700 text-white p-1 rounded-r-lg h-8"
 			bind:value={$fromCurrency}
 			on:change={() => {
 				convert();
@@ -223,16 +228,16 @@
 			</g></svg
 		>
 	</button>
-	<div>
+	<div class="flex gap-0 items-center">
 		<input
-			class="bg-gray-700 text-white"
+			class="bg-gray-700 text-white p-1 rounded-l-lg h-8 border-r-2"
 			type="number"
 			bind:value={$convertedAmount}
 			on:input={convert2}
 			min="0"
 		/>
 		<select
-			class="bg-gray-700 text-white"
+			class="bg-gray-700 text-white p-1 rounded-r-lg h-8"
 			bind:value={$toCurrency}
 			on:change={() => {
 				convert();
@@ -253,7 +258,7 @@
 <div class="mt-4">
 	<label class="text-white" for="days">Number of days:</label>
 	<input
-		class="bg-gray-700 text-white pl-1 rounded-lg shadow-md"
+		class="bg-gray-700 text-white pl-1 rounded-lg shadow-md p-1"
 		id="days"
 		type="number"
 		min="1"

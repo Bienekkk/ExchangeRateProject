@@ -12,7 +12,7 @@
 						aria-expanded="false"
 						aria-label="Toggle sidenav"
 						on:click={openSidebar}
-						class="text-4xl text-white focus:outline-none lg:hidden left-0"
+						class="text-4xl text-white focus:outline-none lg:hidden left-0 -mt-2"
 					>
 						&#8801;
 					</button>
@@ -30,7 +30,7 @@
 					<img
 						alt="CR7"
 						src="/images/npm-logo.png"
-						class="h-10 mx-auto object-cover rounded-full w-10	"
+						class="h-10 mx-auto object-cover rounded-full w-10"
 					/>
 				</span>
 			</div>
