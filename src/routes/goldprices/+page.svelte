@@ -6,10 +6,21 @@
     let historicalRates = writable<number[]>([]);
     let historicalRatesOunce = writable<number[]>([]);
     let historicalDates = writable<string[]>([]);
-    let days = writable<number>(7);
+    let days = writable<number>(8);
     let trendInfo = writable<{ text: string; image: string }[]>([]);
     let chart: Chart | null = null;
     const OUNCE_IN_GRAMS = 28.0;
+
+
+
+    days.subscribe(value => {
+        if (value > 366) {
+            days.set(366);
+        } else if (value < 1) {
+            days.set(1);
+        }
+    });
+
 
     const formatDate = (date: Date): string => date.toISOString().split('T')[0];
 
@@ -39,7 +50,7 @@
     }
 
     function analyzeTrends(prices: number[]) {
-        const periods = [7, 30, 90, 180, 365]; // 1 tydzień, 1 miesiąc, 3 miesiące, 6 miesięcy
+        const periods = [7, 30, 90, 180]; // 1 tydzień, 1 miesiąc, 3 miesiące, 6 miesięcy
         let trendResults: { text: string; image: string }[] = [];
 
         periods.forEach(period => {
@@ -116,7 +127,7 @@
         id="days"
         type="number"
         min="1"
-        max="180"
+        max="366"
         bind:value={$days}
         on:input={fetchHistoricalRates}
         class="ml-2 p-2 border border-gray-300 rounded-lg bg-gray-700 text-white"
