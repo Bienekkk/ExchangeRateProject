@@ -84,7 +84,6 @@
                         backgroundColor: 'rgba(255, 215, 0, 0.2)',
                         fill: true,
                         borderWidth: 2,
-                        pointRadius: 0,
                     },
                     {
                         label: 'Gold Price (PLN/ounce)',
@@ -94,7 +93,6 @@
                         fill: true,
                         borderWidth: 3,
                         borderDash: [5, 5],
-                        pointRadius: 0,
                         pointBackgroundColor: 'orange',
                     }
                 ],
