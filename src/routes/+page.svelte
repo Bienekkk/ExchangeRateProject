@@ -149,6 +149,19 @@
 			console.error('Error fetching historical rates:', error);
 		}
 	}
+	function handleInput(event: Event) {
+	const target = event.target as HTMLInputElement;
+	const value = target.value;
+
+	if (value.includes('.') || value.includes(',')) {
+		target.value = parseInt(value).toString();
+		days.set(parseInt(value));
+	} else {
+		days.set(Number(value));
+	}
+	
+	fetchHistoricalRates();
+}
 
 	function updateChart() {
 		if (chart) {
@@ -263,7 +276,9 @@
 		type="number"
 		min="1"
 		max="90"
+		step="1"
 		bind:value={$days}
+		on:input={handleInput}
 		on:input={fetchHistoricalRates}
 	/>
 </div>

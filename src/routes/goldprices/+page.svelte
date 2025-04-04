@@ -66,6 +66,21 @@
         trendInfo.set(trendResults);
     }
 
+    function handleInput(event: Event) {
+	const target = event.target as HTMLInputElement;
+	const value = target.value;
+
+	if (value.includes('.') || value.includes(',')) {
+		target.value = parseInt(value).toString();
+		days.set(parseInt(value));
+	} else {
+		days.set(Number(value));
+	}
+	
+	fetchHistoricalRates();
+}
+
+
     function renderChart() {
         const ctx = document.getElementById('goldChart') as HTMLCanvasElement;
         if (chart) {
@@ -123,14 +138,16 @@
 <div class="mt-4">
     <label class="text-white font-semibold" for="days">Number of days:</label>
     <input
-        id="days"
-        type="number"
-        min="1"
-        max="366"
-        bind:value={$days}
-        on:input={fetchHistoricalRates}
-        class="ml-2 p-2 border border-gray-300 rounded-lg bg-gray-700 text-white"
-    />
+	id="days"
+	type="number"
+	min="1"
+	max="366"
+	step="1"
+	bind:value={$days}
+	on:input={handleInput}
+	class="ml-2 p-2 border border-gray-300 rounded-lg bg-gray-700 text-white"
+/>
+
 </div>
 
 <div class="mt-4 p-4 bg-gray-800 rounded-lg shadow-md text-white">
