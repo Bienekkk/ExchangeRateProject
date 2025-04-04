@@ -1,7 +1,8 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import { writable } from 'svelte/store';
-    import Chart from 'chart.js/auto';
+	import { onMount } from 'svelte';
+	import { writable } from 'svelte/store';
+	import Content from '../../components/Content.svelte';
+	import Chart from 'chart.js/auto';
 
     let historicalRates = writable<number[]>([]);
     let historicalRatesOunce = writable<number[]>([]);
@@ -113,12 +114,12 @@
 </script>
 
 <svelte:head>
-    <title>Gold Prices Chart</title>
+	<title>Gold Prices Chart</title>
 </svelte:head>
+<Content title="Gold Prices Chart" />
 
-<h1 class="text-white text-2xl font-bold">Gold Prices Chart</h1>
 <div class="container mt-4 h-96 bg-gray-900 p-4 rounded-lg shadow-lg">
-    <canvas id="goldChart"></canvas>
+	<canvas id="goldChart" />
 </div>
 
 <div class="mt-4">
@@ -135,11 +136,11 @@
 </div>
 
 <div class="mt-4 p-4 bg-gray-800 rounded-lg shadow-md text-white">
-    <h2 class="text-lg font-semibold">Trend Analysis:</h2>
-    {#each $trendInfo as trend}
-        <div class="flex items-center mt-2">
-            <span class="text-xl">{trend.image}</span>
-            <span class="ml-2">{trend.text}</span>
-        </div>
-    {/each}
+	<h2 class="text-lg font-semibold">Trend Analysis:</h2>
+	{#each $trendInfo as trend}
+		<div class="flex items-center mt-2">
+			<span class="text-xl">{trend.image}</span>
+			<span class="ml-2">{trend.text}</span>
+		</div>
+	{/each}
 </div>
