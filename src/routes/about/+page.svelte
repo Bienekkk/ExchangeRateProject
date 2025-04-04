@@ -9,7 +9,7 @@
 <Content title="About" />
 
 <div
-	class="mx-auto flex-col mx-auto items-center gap-x-4 rounded-xl p-12 outline outline-black/5 bg-gray-800 dark:bg-slate-100 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10"
+	class="mx-auto flex-col mx-auto items-center gap-x-4 rounded-xl p-12 outline outline-black/5 bg-gray-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10"
 >
 	<h1 class="text-white text-xl text-center pb-4">Exchange Project</h1>
 	<p class="text-white text-center text-xl">
